@@ -44,11 +44,18 @@
 
 PCD_HandleTypeDef hpcd_USB_OTG_HS;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for ToggleLed */
+osThreadId_t ToggleLedHandle;
+const osThreadAttr_t ToggleLed_attributes = {
+  .name = "ToggleLed",
   .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for USBCDC */
+osThreadId_t USBCDCHandle;
+const osThreadAttr_t USBCDC_attributes = {
+  .name = "USBCDC",
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
@@ -59,7 +66,8 @@ const osThreadAttr_t defaultTask_attributes = {
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USB_OTG_HS_PCD_Init(void);
-void StartDefaultTask(void *argument);
+void ToggleLedTask(void *argument);
+void USBCDCTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -124,8 +132,11 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of ToggleLed */
+  ToggleLedHandle = osThreadNew(ToggleLedTask, NULL, &ToggleLed_attributes);
+
+  /* creation of USBCDC */
+  USBCDCHandle = osThreadNew(USBCDCTask, NULL, &USBCDC_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -724,14 +735,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_ToggleLedTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the ToggleLed thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_ToggleLedTask */
+void ToggleLedTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
@@ -740,6 +751,24 @@ void StartDefaultTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_USBCDCTask */
+/**
+* @brief Function implementing the USBCDC thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_USBCDCTask */
+void USBCDCTask(void *argument)
+{
+  /* USER CODE BEGIN USBCDCTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END USBCDCTask */
 }
 
 /**
