@@ -745,6 +745,7 @@ static void MX_GPIO_Init(void)
 void ToggleLedTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
+  UNUSED(argument);
   /* Infinite loop */
   for(;;)
   {
@@ -763,6 +764,7 @@ void ToggleLedTask(void *argument)
 void USBCDCTask(void *argument)
 {
   /* USER CODE BEGIN USBCDCTask */
+  UNUSED(argument);
   /* Infinite loop */
   for(;;)
   {
