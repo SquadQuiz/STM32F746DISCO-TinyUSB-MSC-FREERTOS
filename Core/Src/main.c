@@ -92,9 +92,6 @@ void USBDeviceTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
-static void led_blinking_task(void);
-static void cdc_task(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -133,7 +130,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USB_OTG_HS_PCD_Init();
   /* USER CODE BEGIN 2 */
-  tusb_init();
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -791,27 +788,6 @@ void tud_resume_cb(void) {
 //--------------------------------------------------------------------+
 // USB CDC
 //--------------------------------------------------------------------+
-static void cdc_task(void) {
-  // connected() check for DTR bit
-  // Most but not all terminal client set this when making connection
-  // if ( tud_cdc_connected() )
-  {
-    // connected and there are data available
-    if (tud_cdc_available()) {
-      // read data
-      char buf[64];
-      uint32_t count = tud_cdc_read(buf, sizeof(buf));
-      (void) count;
-
-      // Echo back
-      // Note: Skip echo by commenting out write() and write_flush()
-      // for throughput test e.g
-      //    $ dd if=/dev/zero of=/dev/ttyACM0 count=10000
-      tud_cdc_write(buf, count);
-      tud_cdc_write_flush();
-    }
-  }
-}
 
 // Invoked when cdc when line state changed e.g connected/disconnected
 void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts) {
@@ -831,21 +807,6 @@ void tud_cdc_rx_cb(uint8_t itf) {
   (void) itf;
 }
 
-//--------------------------------------------------------------------+
-// BLINKING TASK
-//--------------------------------------------------------------------+
-static void led_blinking_task(void) {
-  static uint32_t start_ms = 0;
-  static bool led_state = false;
-
-  // Blink every interval ms
-  if (HAL_GetTick() - start_ms < blink_interval_ms) return; // not enough time
-  start_ms += blink_interval_ms;
-
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, led_state);
-  led_state = 1 - led_state; // toggle
-}
-
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_ToggleLedTask */
@@ -859,11 +820,18 @@ void ToggleLedTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   UNUSED(argument);
+  static uint32_t start_ms = 0;
+  static bool led_state = false;
+
   /* Infinite loop */
   for(;;)
   {
-    led_blinking_task();
-    osDelay(1);
+    // Blink every interval ms
+    osDelay(blink_interval_ms / portTICK_PERIOD_MS);
+    start_ms += blink_interval_ms;
+
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, led_state);
+    led_state = 1 - led_state; // toggle
   }
   /* USER CODE END 5 */
 }
@@ -879,10 +847,32 @@ void USBCDCTask(void *argument)
 {
   /* USER CODE BEGIN USBCDCTask */
   UNUSED(argument);
+
   /* Infinite loop */
   for(;;)
   {
-    cdc_task();
+    // connected() check for DTR bit
+    // Most but not all terminal client set this when making connection
+    // if ( tud_cdc_connected() )
+    {
+      // There are data available
+      while (tud_cdc_available()) {
+        uint8_t buf[64];
+
+        // read and echo back
+        uint32_t count = tud_cdc_read(buf, sizeof(buf));
+        (void) count;
+
+        // Echo back
+        // Note: Skip echo by commenting out write() and write_flush()
+        // for throughput test e.g
+        //    $ dd if=/dev/zero of=/dev/ttyACM0 count=10000
+        tud_cdc_write(buf, count);
+      }
+
+      tud_cdc_write_flush();
+    }
+
     osDelay(1);
   }
   /* USER CODE END USBCDCTask */
@@ -899,6 +889,10 @@ void USBDeviceTask(void *argument)
 {
   /* USER CODE BEGIN USBDeviceTask */
   UNUSED(argument);
+
+  // TinyUSB Initialize
+  tusb_init();
+
   /* Infinite loop */
   for(;;)
   {
