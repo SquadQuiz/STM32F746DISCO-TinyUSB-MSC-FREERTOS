@@ -40,6 +40,19 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
+# Define the TinyUSB configuration target as an INTERFACE library
+add_library(tinyusb_config INTERFACE)
+
+# Add TinyUSB include paths
+target_include_directories(tinyusb_config INTERFACE 
+    Core/Inc
+    tinyusb/src
+    tinyusb/hw
+)
+
+# Add TinyUSB directory
+add_subdirectory(tinyusb/src)
+
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
@@ -47,7 +60,10 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
+    # TinyUSB Example (CDC-MSC) source files
+    Core/Src/msc_disk.c
+    Core/Src/usb_descriptors.c
+    tinyusb/src/portable/synopsys/dwc2/dcd_dwc2.c
 )
 
 # Add include paths
@@ -63,6 +79,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
-
-    # Add user defined libraries
+    # TinyUSB Library Stack
+    tinyusb_config
+    tinyusb
 )
