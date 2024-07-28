@@ -873,6 +873,7 @@ void USBCDCTask(void *argument)
       tud_cdc_write_flush();
     }
 
+    // Yield CPU to other tasks
     osDelay(1);
   }
   /* USER CODE END USBCDCTask */
@@ -890,13 +891,21 @@ void USBDeviceTask(void *argument)
   /* USER CODE BEGIN USBDeviceTask */
   UNUSED(argument);
 
-  // TinyUSB Initialize
+  // init TinyUSB device stack on configured roothub port
+  // This should be called after scheduler/kernel is started.
+  // Otherwise it could cause kernel issue since USB IRQ handler does use RTOS queue API.
   tusb_init();
 
   /* Infinite loop */
   for(;;)
   {
+    // put this thread to waiting state until there is new events
     tud_task();
+
+    // following code only run if tud_task() process at least 1 event
+    tud_cdc_write_flush();
+
+    // Yield CPU to other tasks
     osDelay(1);
   }
   /* USER CODE END USBDeviceTask */
