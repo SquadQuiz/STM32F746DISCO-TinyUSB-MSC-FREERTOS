@@ -58,6 +58,13 @@ const osThreadAttr_t USBCDC_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for USBDevice */
+osThreadId_t USBDeviceHandle;
+const osThreadAttr_t USBDevice_attributes = {
+  .name = "USBDevice",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -68,6 +75,7 @@ static void MX_GPIO_Init(void);
 static void MX_USB_OTG_HS_PCD_Init(void);
 void ToggleLedTask(void *argument);
 void USBCDCTask(void *argument);
+void USBDeviceTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -137,6 +145,9 @@ int main(void)
 
   /* creation of USBCDC */
   USBCDCHandle = osThreadNew(USBCDCTask, NULL, &USBCDC_attributes);
+
+  /* creation of USBDevice */
+  USBDeviceHandle = osThreadNew(USBDeviceTask, NULL, &USBDevice_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -771,6 +782,26 @@ void USBCDCTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END USBCDCTask */
+}
+
+/* USER CODE BEGIN Header_USBDeviceTask */
+/**
+* @brief Function implementing the USBDevice thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_USBDeviceTask */
+void USBDeviceTask(void *argument)
+{
+  /* USER CODE BEGIN USBDeviceTask */
+  UNUSED(argument);
+  /* Infinite loop */
+  for(;;)
+  {
+
+    osDelay(1);
+  }
+  /* USER CODE END USBDeviceTask */
 }
 
 /**
