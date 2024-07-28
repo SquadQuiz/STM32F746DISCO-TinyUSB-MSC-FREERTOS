@@ -60,14 +60,14 @@ osThreadId_t ToggleLedHandle;
 const osThreadAttr_t ToggleLed_attributes = {
   .name = "ToggleLed",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityBelowNormal,
 };
 /* Definitions for USBCDC */
 osThreadId_t USBCDCHandle;
 const osThreadAttr_t USBCDC_attributes = {
   .name = "USBCDC",
   .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityBelowNormal7,
 };
 /* Definitions for USBDevice */
 osThreadId_t USBDeviceHandle;
