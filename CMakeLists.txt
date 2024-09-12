@@ -46,6 +46,8 @@ add_library(tinyusb_config INTERFACE)
 # Add TinyUSB include paths
 target_include_directories(tinyusb_config INTERFACE 
     Core/Inc
+    Middlewares/Third_Party/FreeRTOS/Source/include/
+    Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/
     tinyusb/src
     tinyusb/hw
 )

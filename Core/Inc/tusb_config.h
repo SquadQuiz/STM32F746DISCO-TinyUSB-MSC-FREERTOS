@@ -41,11 +41,11 @@
 
 #ifndef USE_USB_FULL_SPEED
   #define CFG_TUSB_MCU                 OPT_MCU_STM32F7
-  #define CFG_TUSB_OS                  OPT_OS_NONE
+  #define CFG_TUSB_OS                  OPT_OS_FREERTOS
   #define BOARD_TUD_MAX_SPEED          OPT_MODE_HIGH_SPEED
   #define BOARD_TUD_RHPORT             1U
   #define CFG_TUSB_RHPORT1_MODE        (OPT_MODE_DEVICE | OPT_MODE_HIGH_SPEED)
-#elif
+#else
   #define CFG_TUSB_MCU                 OPT_MCU_STM32F7
   #define CFG_TUSB_OS                  OPT_OS_NONE
   #define BOARD_TUD_MAX_SPEED          OPT_MODE_FULL_SPEED
@@ -59,7 +59,7 @@
 
 // RHPort number used for device can be defined by board.mk, default to port 0
 #ifndef BOARD_TUD_RHPORT
-#define BOARD_TUD_RHPORT      0
+#define BOARD_TUD_RHPORT     0
 #endif
 
 // RHPort max operational speed can defined by board.mk
@@ -68,18 +68,25 @@
 #endif
 
 //--------------------------------------------------------------------
-// Common Configuration
+// COMMON CONFIGURATION
 //--------------------------------------------------------------------
 
-// defined by compiler flags for flexibility
+// defined by board.mk
 #ifndef CFG_TUSB_MCU
 #error CFG_TUSB_MCU must be defined
 #endif
 
+// This examples use FreeRTOS
 #ifndef CFG_TUSB_OS
-#define CFG_TUSB_OS           OPT_OS_NONE
+#define CFG_TUSB_OS           OPT_OS_FREERTOS
 #endif
 
+// Espressif IDF requires "freertos/" prefix in include path
+#if TUP_MCU_ESPRESSIF
+#define CFG_TUSB_OS_INC_PATH  freertos/
+#endif
+
+// can be defined by compiler in DEBUG build
 #ifndef CFG_TUSB_DEBUG
 #define CFG_TUSB_DEBUG        0
 #endif
@@ -110,7 +117,7 @@
 //--------------------------------------------------------------------
 
 #ifndef CFG_TUD_ENDPOINT0_SIZE
-#define CFG_TUD_ENDPOINT0_SIZE    64
+#define CFG_TUD_ENDPOINT0_SIZE   64
 #endif
 
 //------------- CLASS -------------//
